@@ -1,4 +1,4 @@
-module Cosine_tfidf(query_string, appendStr, removeDir, tf_idf, similarity) 
+module Cosine_tfidf(query_documents, appendStr, removeDir, tf_idf, similarity) 
 where
 
 import qualified Data.Map
@@ -13,6 +13,52 @@ import Data.Function (on)
 import Data.List (sortBy)
 import System.Environment
 import System.IO.Unsafe (unsafePerformIO)
+
+
+
+tf_idf ::[String] -> [String] ->[(String, [(String, Double)])]
+tf_idf d f = do
+		let termfreq = termfrequency d f 
+		let noofdocs = length $ removeDir d
+		let m = map idf f
+		--let computeidf = idf noofdocs
+		let k = unzip $ mconcat m 
+		let idfc = Data.Map.toList(foldl (count) Data.Map.empty (fst k))
+		let idfmap = Data.Map.fromList(map (calcidf noofdocs) idfc)
+		--print(idfmap)
+		let hashmaplist = map Data.Map.toList termfreq
+		let tfidf =  map (findtfidf idfmap) hashmaplist
+		(concat) tfidf
+
+termfrequency :: [String] -> [String] ->  [Data.Map.Map String [(String, Int)]]
+termfrequency d f = do 
+				let termfreq = map tf (zip (removeDir d) f)
+				termfreq
+
+similarity :: [String] -> [String] -> Double
+similarity d f =  do 
+				
+		let termfreq = termfrequency d f 
+		let noofdocs = length $ removeDir d
+		let mapall = map makemap $ mconcat $ map Data.Map.elems termfreq
+		let listofstrings = map fst $Data.Map.toList $ Data.Map.fromListWith (+) ((mconcat.mconcat) (map Data.Map.elems termfreq))
+		let firstdoc = buildfreqmap (mapall!!0) listofstrings
+		let seconddoc = buildfreqmap (mapall!!1) listofstrings
+		let concatmap = Data.Map.toList(firstdoc) ++ Data.Map.toList(seconddoc)
+		cosinesim concatmap (map snd (Data.Map.toList(firstdoc))) (map snd (Data.Map.toList(seconddoc))) 
+
+query_documents :: String -> [String] -> [String] -> [(String,Double)]
+query_documents qs d f =  do 
+				
+		let noofdocs = length $ removeDir d
+		let termfreq = termfrequency d f
+		let tfidf = tf_idf d f		
+		let s = map (query (words(qs))) (tfidf)
+		let filtered = filter (\(_,y) -> y /= 0.0) ((concat) s)
+		let sorted = reverse (sortBy (compare `on` snd) (filtered))
+		sorted
+
+
 
 count::  Data.Map.Map String Int ->String-> Data.Map.Map String Int
 count m e = case (Data.Map.lookup e m) of 
@@ -94,47 +140,6 @@ combinetfidf :: [(String, [(String,Double)])] -> (String, Double)
 combinetfidf [(a, b)] = (a, (foldl (+) 0.0 (map snd b)))
 combinetfidf _ = ("nothing", 0.0)
 
-tf_idf ::[String] -> [String] ->[(String, [(String, Double)])]
-tf_idf d f = do
-		let termfreq = termfrequency d f 
-		let noofdocs = length $ removeDir d
-		let m = map idf f
-		--let computeidf = idf noofdocs
-		let k = unzip $ mconcat m 
-		let idfc = Data.Map.toList(foldl (count) Data.Map.empty (fst k))
-		let idfmap = Data.Map.fromList(map (calcidf noofdocs) idfc)
-		--print(idfmap)
-		let hashmaplist = map Data.Map.toList termfreq
-		let tfidf =  map (findtfidf idfmap) hashmaplist
-		(concat) tfidf
-
-termfrequency :: [String] -> [String] ->  [Data.Map.Map String [(String, Int)]]
-termfrequency d f = do 
-				let termfreq = map tf (zip (removeDir d) f)
-				termfreq
-
-similarity :: [String] -> [String] -> Double
-similarity d f =  do 
-				
-		let termfreq = termfrequency d f 
-		let noofdocs = length $ removeDir d
-		let mapall = map makemap $ mconcat $ map Data.Map.elems termfreq
-		let listofstrings = map fst $Data.Map.toList $ Data.Map.fromListWith (+) ((mconcat.mconcat) (map Data.Map.elems termfreq))
-		let firstdoc = buildfreqmap (mapall!!0) listofstrings
-		let seconddoc = buildfreqmap (mapall!!1) listofstrings
-		let concatmap = Data.Map.toList(firstdoc) ++ Data.Map.toList(seconddoc)
-		cosinesim concatmap (map snd (Data.Map.toList(firstdoc))) (map snd (Data.Map.toList(seconddoc))) 
-
-query_string :: String -> [String] -> [String] -> [(String,Double)]
-query_string qs d f =  do 
-				
-		let noofdocs = length $ removeDir d
-		let termfreq = termfrequency d f
-		let tfidf = tf_idf d f		
-		let s = map (query (words(qs))) (tfidf)
-		let filtered = filter (\(_,y) -> y /= 0.0) ((concat) s)
-		let sorted = reverse (sortBy (compare `on` snd) (filtered))
-		sorted
 
 
 
