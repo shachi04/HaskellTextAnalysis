@@ -1,4 +1,4 @@
-HaskellTextAnalysis
+HaskellDocumentAnalysis
 ===================
 
 Text analysis using Haskell
