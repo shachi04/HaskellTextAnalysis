@@ -4,7 +4,7 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 
-import Cosine_tfidf(query_string, appendStr, removeDir)
+import Cosine_tfidf(query_documents, appendStr, removeDir)
 import System.IO.Unsafe (unsafePerformIO)
 import Yesod
 import Control.Applicative
@@ -74,7 +74,7 @@ documentForm extra =  do
     return (docRes, widget)
 t:: [String]
 t = unsafePerformIO $ do 
-        let directory = "/Users/girishsk/Documents/Shachi/files/"
+        let directory = "./YourDirectory"
         d <- getDirectoryContents (directory)
         f <- mapM readFile(map (appendStr directory) (removeDir d)) 
         let a  = (map appendStr (removeDir d))
@@ -82,7 +82,7 @@ t = unsafePerformIO $ do
        
 t2:: [String]
 t2 = unsafePerformIO $ do 
-        let directory = "/Users/girishsk/Documents/Shachi/files/"
+        let directory = "./YourDirectory"
         d <- getDirectoryContents (directory)
         f <- mapM readFile(map (appendStr directory) (removeDir d))       
         return f  
@@ -99,7 +99,7 @@ getRootR =  do
         let b = t
         let contents = t2
 
-        let s = query_string (query res) b contents
+        let s = query_documents (query res) b contents
 
         defaultLayout
             [whamlet|
