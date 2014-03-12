@@ -1,6 +1,6 @@
 import System.IO
 import System.Directory
-import Cosine_tfidf(query_string, appendStr, removeDir, tf_idf, similarity)
+import Cosine_tfidf(query_documents, appendStr, removeDir, tf_idf, similarity)
 import System.Environment
 
 main :: IO ()
@@ -13,5 +13,5 @@ main = do
 	print("PRINTING THE COSINE SIMILARITY")
 	print(similarity d f)
 	enter <- putStrLn "ENTER YOUR SEARCH QUERY"
-	q <-getLine
- 	print(query_string q d f)
+	querystring <-getLine
+ 	print(query_documents querystring d f)
