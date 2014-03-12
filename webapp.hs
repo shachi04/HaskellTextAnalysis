@@ -40,14 +40,8 @@ data Search = Search { querystring :: Text}
 documentForm :: Html -> MForm Handler (FormResult Search, Widget)
 documentForm extra =  do
     (queryRes, queryView) <- mreq textField "this is not used" Nothing
---    (ageRes, ageView) <- mreq intField "neither is this" Nothing
     let docRes = Search <$> queryRes  
-    let p = String <$> queryRes-- <*> ageRes
-    let footer = do 
-              [hamlet|
-                 <footer>
-                      <p>That's all folks!
-                |]
+    let p = String <$> queryRes
     let widget = do
             [whamlet|
                 <p>
