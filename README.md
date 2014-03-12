@@ -1,4 +1,4 @@
 Haskell Document Analysis
 ===================
 
-Tf-Idf, Cosine similarity and a webapp for document ranking based on word relevance. 
+Document Search and Ranking based on word relevance. 
