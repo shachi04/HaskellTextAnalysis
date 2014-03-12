@@ -79,8 +79,6 @@ readcontents = unsafePerformIO $ do
         f <- mapM readFile(map (appendStr directory) (removeDir d))       
         return f  
 
-l :: Search -> String
-l (Search a) = unpack a 
 query ::FormResult Search -> String  
 query (FormSuccess (Search qs)) = unpack qs
 query _ = " "
