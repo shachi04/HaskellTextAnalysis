@@ -20,8 +20,6 @@ import Data.Monoid
 import Data.Function (on)
 import Data.List (sortBy)
 
---addStylesheet $ StaticR css_bootstrap_css
-
 data MFormExample = MFormExample
 
 mkYesod "MFormExample" [parseRoutes|
@@ -66,16 +64,16 @@ documentForm extra =  do
                 |]
 
     return (docRes, widget)
-t:: [String]
-t = unsafePerformIO $ do 
+readdir:: [String]
+readdir = unsafePerformIO $ do 
         let directory = "./YourDirectory"
         d <- getDirectoryContents (directory)
         f <- mapM readFile(map (appendStr directory) (removeDir d)) 
         let a  = (map appendStr (removeDir d))
         return (removeDir d) 
        
-t2:: [String]
-t2 = unsafePerformIO $ do 
+readcontents:: [String]
+readcontents = unsafePerformIO $ do 
         let directory = "./YourDirectory"
         d <- getDirectoryContents (directory)
         f <- mapM readFile(map (appendStr directory) (removeDir d))       
@@ -90,10 +88,10 @@ query _ = " "
 getRootR :: Handler Html
 getRootR =  do
         ((res,  widget), enctype) <- runFormGet documentForm
-        let b = t
-        let contents = t2
+        let dir = readdir
+        let contents = readcontents
 
-        let s = query_documents (query res) b contents
+        let s = query_documents (query res) dir contents
 
         defaultLayout
             [whamlet|
